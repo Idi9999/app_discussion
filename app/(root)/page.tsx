@@ -6,12 +6,16 @@ import ThreadCard from "@/components/cards/ThreadCard";
 
 import { fetchPosts } from "@/lib/actions/thread.actions";
 import { fetchUser } from "@/lib/actions/user.actions";
+import Pagination from "@/components/shared/Pagination";
 
 async function Home({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | undefined };
+  searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
+
+  const resolvedSearchParams = await searchParams; // Résolution de la promesse
+
   const user = await currentUser();
   if (!user) return null;
 
@@ -19,7 +23,7 @@ async function Home({
   if (!userInfo?.onboarded) redirect("/onboarding");
 
   const result = await fetchPosts(
-    searchParams.page ? +searchParams.page : 1,
+    resolvedSearchParams.page ? +resolvedSearchParams.page : 1,
     30
   );
 
@@ -49,11 +53,11 @@ async function Home({
         )}
       </section>
 
-      {/* <Pagination
+      <Pagination
         path='/'
-        pageNumber={searchParams?.page ? +searchParams.page : 1}
+        pageNumber={resolvedSearchParams?.page ? +resolvedSearchParams.page : 1}
         isNext={result.isNext}
-      /> */}
+      />
     </>
   );
 }
